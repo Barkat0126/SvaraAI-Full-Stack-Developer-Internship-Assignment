@@ -1,22 +1,26 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import styles from './Card.module.css';
 
-const Card = forwardRef(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200",
-      className
-    )}
-    {...props}
-  />
-));
+const Card = forwardRef(({ className, variant = "default", ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        styles.card,
+        variant !== "default" && styles[variant],
+        className
+      )}
+      {...props}
+    />
+  );
+});
 Card.displayName = "Card";
 
 const CardHeader = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6 pb-4", className)}
+    className={cn(styles.cardHeader, className)}
     {...props}
   />
 ));
@@ -25,7 +29,7 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = forwardRef(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-lg font-semibold leading-none tracking-tight text-gray-900", className)}
+    className={cn(styles.cardTitle, className)}
     {...props}
   />
 ));
@@ -34,25 +38,21 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-600", className)}
+    className={cn(styles.cardDescription, className)}
     {...props}
   />
 ));
 CardDescription.displayName = "CardDescription";
 
 const CardContent = forwardRef(({ className, ...props }, ref) => (
-  <div 
-    ref={ref} 
-    className={cn("p-6 pt-0", className)} 
-    {...props} 
-  />
+  <div ref={ref} className={cn(styles.cardContent, className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
 const CardFooter = forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn(styles.cardFooter, className)}
     {...props}
   />
 ));

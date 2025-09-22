@@ -72,21 +72,21 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
 
   return (
     <>
-      <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 rounded-2xl">
+      <Card className="group relative overflow-hidden bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 rounded-2xl">
         {/* Gradient accent bar */}
         <div className={`h-1.5 w-full ${statusConfig.color}`}></div>
         
         {/* Hover overlay effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
         
         <CardContent className="relative p-6 space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-700 transition-colors duration-200 truncate">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors duration-200 truncate">
                 {project.name}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+              <p className="text-slate-400 text-sm leading-relaxed line-clamp-2">
                 {project.description || 'No description provided'}
               </p>
             </div>
@@ -97,7 +97,7 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
                 onClick={() => setIsEditModalOpen(true)}
                 size="sm"
                 variant="ghost"
-                className="h-8 w-8 p-0 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all duration-200"
+                className="h-8 w-8 p-0 hover:bg-blue-500/20 hover:text-blue-400 rounded-lg transition-all duration-200"
                 title="Edit project"
               >
                 <span className="text-sm">✏️</span>
@@ -107,11 +107,11 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
                 disabled={isDeleting}
                 size="sm"
                 variant="ghost"
-                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 rounded-lg transition-all duration-200"
+                className="h-8 w-8 p-0 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-all duration-200"
                 title="Delete project"
               >
                 {isDeleting ? (
-                  <div className="animate-spin rounded-full h-3 w-3 border border-red-500 border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-3 w-3 border border-red-400 border-t-transparent"></div>
                 ) : (
                   <span className="text-sm">🗑️</span>
                 )}
@@ -128,7 +128,7 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
               {project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('_', ' ')}
             </Badge>
             
-            <div className="text-xs text-gray-500 flex items-center gap-1">
+            <div className="text-xs text-slate-400 flex items-center gap-1">
               <span>📅</span>
               {formatDate(project.createdAt)}
             </div>
@@ -136,11 +136,11 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
 
           {/* Deadline */}
           {project.deadline && (
-            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl border border-orange-400/20">
               <span className="text-sm">⏰</span>
               <div>
-                <div className="text-xs text-gray-600 font-medium">Deadline</div>
-                <div className="text-sm font-semibold text-orange-700">
+                <div className="text-xs text-slate-400 font-medium">Deadline</div>
+                <div className="text-sm font-semibold text-orange-400">
                   {formatDate(project.deadline)}
                 </div>
               </div>
@@ -148,8 +148,8 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
+            <div className="flex items-center gap-4 text-xs text-slate-400">
               <div className="flex items-center gap-1">
                 <span>📋</span>
                 <span>{project.taskCount || 0} tasks</span>
@@ -159,7 +159,7 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
             <Button
               onClick={() => window.location.href = `/projects/${project._id}/kanban`}
               size="sm"
-              className="bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105 flex items-center gap-1.5"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105 flex items-center gap-1.5 border border-blue-400/20"
             >
               <span>👁️</span>
               View Board
@@ -168,13 +168,13 @@ export default function ProjectCard({ project, onUpdate, onDelete }) {
 
           {/* Progress indicator */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-gray-600">
+            <div className="flex justify-between text-xs text-slate-400">
               <span>Progress</span>
               <span>{project.completionPercentage || 0}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${project.completionPercentage || 0}%` }}
               ></div>
             </div>

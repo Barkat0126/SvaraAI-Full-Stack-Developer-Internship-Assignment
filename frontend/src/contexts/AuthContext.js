@@ -53,7 +53,11 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       
       toast.success('Login successful!');
-      router.push('/dashboard');
+      
+      // Use replace instead of push to prevent back button issues
+      setTimeout(() => {
+        router.replace('/dashboard');
+      }, 100);
       
       return { success: true };
     } catch (error) {
@@ -75,7 +79,11 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       
       toast.success('Registration successful!');
-      router.push('/dashboard');
+      
+      // Use replace instead of push to prevent back button issues
+      setTimeout(() => {
+        router.replace('/dashboard');
+      }, 100);
       
       return { success: true };
     } catch (error) {
@@ -95,8 +103,12 @@ export const AuthProvider = ({ children }) => {
     } finally {
       Cookies.remove('token');
       setUser(null);
-      router.push('/auth/login');
       toast.success('Logged out successfully');
+      
+      // Use replace instead of push to prevent back button issues
+      setTimeout(() => {
+        router.replace('/auth/login');
+      }, 100);
     }
   };
 

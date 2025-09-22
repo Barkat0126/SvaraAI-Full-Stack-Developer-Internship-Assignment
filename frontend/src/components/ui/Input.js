@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import styles from './Input.module.css';
 
 const Input = forwardRef(({ 
   className, 
@@ -12,28 +13,25 @@ const Input = forwardRef(({
   ...props 
 }, ref) => {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className={styles.label}>
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className={styles.required}>*</span>}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Icon className="h-5 w-5 text-gray-400" />
+          <div className={styles.iconWrapper}>
+            <Icon className={styles.icon} />
           </div>
         )}
         <input
           type={type}
           className={cn(
-            "flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm",
-            "placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
-            "transition-all duration-200",
-            Icon && "pl-10",
-            error && "border-red-500 focus:ring-red-500",
+            styles.input,
+            Icon && styles.withIcon,
+            error && styles.error,
             className
           )}
           ref={ref}
@@ -42,8 +40,8 @@ const Input = forwardRef(({
       </div>
       {helperText && (
         <p className={cn(
-          "text-xs",
-          error ? "text-red-600" : "text-gray-500"
+          styles.helperText,
+          error && styles.errorText
         )}>
           {helperText}
         </p>
@@ -66,19 +64,16 @@ const Textarea = forwardRef(({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className={styles.label}>
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className={styles.required}>*</span>}
         </label>
       )}
       <textarea
         rows={rows}
         className={cn(
-          "flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm",
-          "placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
-          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
-          "transition-all duration-200 resize-none",
-          error && "border-red-500 focus:ring-red-500",
+          styles.textarea,
+          error && styles.error,
           className
         )}
         ref={ref}
@@ -86,8 +81,8 @@ const Textarea = forwardRef(({
       />
       {helperText && (
         <p className={cn(
-          "text-xs",
-          error ? "text-red-600" : "text-gray-500"
+          styles.helperText,
+          error && styles.errorText
         )}>
           {helperText}
         </p>

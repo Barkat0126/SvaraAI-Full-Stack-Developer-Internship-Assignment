@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { tasksAPI, projectsAPI } from '@/lib/api';
 import { Button, Input } from '@/components/ui';
+import { getPriorityConfig, getStatusConfig, PRIORITY_OPTIONS, STATUS_OPTIONS } from '@/lib/priorityUtils';
 import toast from 'react-hot-toast';
 
 export default function EditTaskModal({ isOpen, onClose, task, onTaskUpdated }) {
@@ -171,9 +172,14 @@ export default function EditTaskModal({ isOpen, onClose, task, onTaskUpdated }) 
                   {...register('priority')}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                 >
-                  <option value="low">🟢 Low Priority</option>
-                  <option value="medium">🟡 Medium Priority</option>
-                  <option value="high">🔴 High Priority</option>
+                  {PRIORITY_OPTIONS.map((priority) => {
+                    const config = getPriorityConfig(priority);
+                    return (
+                      <option key={priority} value={priority}>
+                        {config.icon} {config.text}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
@@ -186,9 +192,14 @@ export default function EditTaskModal({ isOpen, onClose, task, onTaskUpdated }) 
                   {...register('status')}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                 >
-                  <option value="todo">📋 To Do</option>
-                  <option value="inProgress">⚡ In Progress</option>
-                  <option value="completed">✅ Completed</option>
+                  {STATUS_OPTIONS.map((status) => {
+                    const config = getStatusConfig(status);
+                    return (
+                      <option key={status} value={status}>
+                        {config.icon} {config.text}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
