@@ -1,11 +1,13 @@
 # SvaraAI Full-Stack Developer Internship Assignment
 
-A comprehensive task management application built with modern web technologies, featuring user authentication, project management, and an interactive Kanban board with drag-and-drop functionality.
+A comprehensive task management application built with modern web technologies, featuring user authentication, project management, and an interactive Kanban board with advanced drag-and-drop functionality. This application showcases a complete full-stack implementation with responsive design, modern UI/UX, and professional-grade code architecture.
 
 ## 🚀 Live Demo
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000
+- **Dashboard**: http://localhost:3000/dashboard
+- **Projects**: http://localhost:3000/projects
 
 ## 📋 Table of Contents
 
@@ -38,50 +40,57 @@ A comprehensive task management application built with modern web technologies, 
 - Project deadlines and descriptions
 - Project statistics and analytics
 
-### 📝 Task Management
-- Interactive Kanban board with drag-and-drop
-- Task status columns: To Do, In Progress, In Review, Completed
-- Task priority levels (Low, Medium, High, Critical)
-- Task assignment and due dates
-- Task tags and descriptions
-- Project-specific task filtering
+### 📝 Advanced Task Management
+- **Interactive Kanban Board** with smooth drag-and-drop functionality
+- **Four Status Columns**: To Do, In Progress, In Review, Completed
+- **Priority System**: Low, Medium, High, Critical with color-coded indicators
+- **Task Assignment** and due date management
+- **Task Tags** and detailed descriptions
+- **Project-specific filtering** and organization
+- **Real-time updates** across all connected clients
+- **Mobile-optimized** touch interactions
 
 ### 📈 Dashboard & Analytics
-- Real-time overview statistics
-- Task completion charts and trends
-- Project status distribution
-- Recent activity tracking
-- Performance metrics
+- **Real-time overview** with live statistics
+- **Task completion metrics** and progress tracking
+- **Project status distribution** with visual charts
+- **Recent activity feed** and change tracking
+- **Performance analytics** and productivity insights
+- **Responsive dashboard** optimized for all devices
 
-### 🎨 Modern UI/UX
-- Responsive design with TailwindCSS v4
-- Modern and intuitive interface
-- Real-time updates and notifications
-- Loading states and error handling
-- Smooth animations and transitions
+### 🎨 Modern UI/UX Design
+- **Mobile-First Responsive Design** with Tailwind CSS
+- **Dark Theme** with gradient backgrounds and modern aesthetics
+- **Touch-Friendly Interactions** optimized for mobile devices
+- **Smooth Animations** and micro-interactions
+- **Loading States** and comprehensive error handling
+- **Professional Color Scheme** with blue/purple gradients
+- **Accessibility Features** and keyboard navigation support
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **React 18** - UI library with latest features
-- **TailwindCSS v4** - Utility-first CSS framework
-- **React Hook Form** - Form validation and handling
-- **@hello-pangea/dnd** - Drag and drop functionality
-- **Recharts** - Data visualization and charts
-- **React Hot Toast** - Notification system
-- **Axios** - HTTP client for API calls
-- **js-cookie** - Cookie management
+- **React 18** with Next.js 14 (App Router)
+- **TypeScript** for type safety and better development experience
+- **Tailwind CSS** for modern, responsive styling
+- **React Hook Form** for efficient form management
+- **React Query/TanStack Query** for server state management
+- **Framer Motion** for smooth animations and transitions
+- **React Beautiful DnD** for advanced drag-and-drop functionality
+- **Lucide React** for modern icon system
+- **Chart.js/React Chart.js** for data visualization
+- **React Hot Toast** for notifications
 
 ### Backend
-- **Express.js** - Node.js web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **JWT** - JSON Web Tokens for authentication
-- **bcryptjs** - Password hashing and security
-- **CORS** - Cross-origin resource sharing
-- **dotenv** - Environment variable management
-- **express-validator** - Input validation middleware
+- **Node.js** with Express.js framework
+- **TypeScript** for type safety and scalability
+- **MongoDB** with Mongoose ODM for data modeling
+- **JWT (JSON Web Tokens)** for secure authentication
+- **bcrypt** for password hashing and security
+- **Express Validator** for comprehensive input validation
+- **CORS** for cross-origin resource sharing
+- **dotenv** for environment variable management
+- **Express Rate Limit** for API protection
 
 ### Development Tools
 - **ESLint** - Code linting and formatting
@@ -204,86 +213,124 @@ Before running this application, ensure you have:
 
 ## 🚀 Installation & Setup
 
-### 1. Clone the Repository
+### Prerequisites
+- **Node.js** (v18.0.0 or higher) - [Download here](https://nodejs.org/)
+- **npm** (v8.0.0 or higher) or **yarn** package manager
+- **MongoDB** (local installation or MongoDB Atlas account) - [Setup guide](https://docs.mongodb.com/manual/installation/)
+- **Git** for version control - [Download here](https://git-scm.com/)
 
+### Quick Start Guide
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Barkat0126/SvaraAI-Full-Stack-Developer-Internship-Assignment.git
+   cd SvaraAI-Full-Stack-Developer-Internship-Assignment
+   ```
+
+2. **Backend Setup**
+   ```bash
+   # Navigate to backend directory
+   cd backend
+   
+   # Install dependencies
+   npm install
+   
+   # Create environment configuration
+   cp .env.example .env
+   
+   # Edit .env file with your configuration:
+   # MONGODB_URI=mongodb://localhost:27017/svaraai-tasks
+   # JWT_SECRET=your-super-secret-jwt-key
+   # PORT=5000
+   # NODE_ENV=development
+   
+   # Start the backend server
+   npm run dev
+   ```
+
+3. **Frontend Setup**
+   ```bash
+   # Open new terminal and navigate to frontend directory
+   cd frontend
+   
+   # Install dependencies
+   npm install
+   
+   # Create environment configuration (optional)
+   # Create .env.local file for custom API URL if needed
+   # NEXT_PUBLIC_API_URL=http://localhost:5000
+   
+   # Start the frontend development server
+   npm run dev
+   ```
+
+4. **Database Setup**
+   ```bash
+   # If using local MongoDB, ensure it's running:
+   # Windows: net start MongoDB
+   # macOS/Linux: sudo systemctl start mongod
+   
+   # The application will automatically create the database and collections
+   ```
+
+5. **Access the Application**
+   - **Frontend**: http://localhost:3000
+   - **Backend API**: http://localhost:5000
+   - **API Documentation**: http://localhost:5000/api-docs (if implemented)
+
+### Alternative Setup Methods
+
+#### Using Docker (Optional)
 ```bash
-git clone https://github.com/Barkat0126/SvaraAI-Full-Stack-Developer-Internship-Assignment.git
-cd SvaraAI-Full-Stack-Developer-Internship-Assignment
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Access the application at:
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000
 ```
 
-### 2. Backend Setup
-
-Navigate to the backend directory:
-```bash
-cd backend
-```
-
-Install dependencies:
-```bash
-npm install
-```
-
-Create environment file:
-```bash
-cp .env.example .env
-```
-
-Configure your environment variables in `.env`:
-```env
-NODE_ENV=development
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/svaraai_taskmanagement
-JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-complex
-JWT_EXPIRE=7d
-CORS_ORIGIN=http://localhost:3000
-```
-
-Start the backend server:
-```bash
-npm start
-```
-
-The backend API will be running on `http://localhost:5000`
-
-### 3. Frontend Setup
-
-Open a new terminal and navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-Install dependencies:
-```bash
-npm install
-```
-
-Create environment file (optional):
-```bash
-# Create .env.local for custom configuration
-echo "NEXT_PUBLIC_API_URL=http://localhost:5000/api" > .env.local
-```
-
-Start the development server:
-```bash
-npm run dev
-```
-
-The frontend application will be running on `http://localhost:3000`
-
-### 4. Database Setup
-
-#### Option A: Local MongoDB
-1. Install MongoDB locally
-2. Start MongoDB service
-3. The application will automatically create the database
-
-#### Option B: MongoDB Atlas (Recommended)
-1. Create a MongoDB Atlas account
+#### Using MongoDB Atlas (Cloud Database)
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
 2. Create a new cluster
-3. Get the connection string
-4. Update `MONGODB_URI` in your `.env` file
+3. Get your connection string
+4. Update the `MONGODB_URI` in your `.env` file
 
-### 5. Verify Installation
+### Troubleshooting
+
+#### Common Issues and Solutions
+
+**Port Already in Use**
+```bash
+# Kill process on port 3000 or 5000
+npx kill-port 3000
+npx kill-port 5000
+```
+
+**MongoDB Connection Issues**
+- Ensure MongoDB is running locally or check Atlas connection string
+- Verify network access and firewall settings
+- Check MongoDB logs for detailed error messages
+
+**Node.js Version Issues**
+```bash
+# Check your Node.js version
+node --version
+
+# Use Node Version Manager (nvm) to switch versions
+nvm install 18
+nvm use 18
+```
+
+**Package Installation Issues**
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Verify Installation
 
 1. Open `http://localhost:3000` in your browser
 2. Register a new account
@@ -494,30 +541,86 @@ Content-Type: application/json
 
 ### Getting Started
 
-1. **Register/Login**: Create a new account or login with existing credentials
-2. **Dashboard**: View your task and project statistics
-3. **Create Projects**: Navigate to Projects page and create your first project
-4. **Manage Tasks**: Use the Kanban board to create and organize tasks
-5. **Track Progress**: Monitor your progress through the dashboard analytics
+1. **Register/Login**: Create an account or login with existing credentials
+2. **Dashboard Overview**: View your project statistics and recent activity
+3. **Create Project**: Set up your first project with a name and description
+4. **Add Tasks**: Create tasks with titles, descriptions, priorities, and due dates
+5. **Kanban Board**: Use the interactive board to manage task workflow
+6. **Track Progress**: Monitor your project progress through analytics
 
-### Key Features
+### Detailed Feature Guide
 
-#### Project Management
-- **Create**: Click "Create Project" and fill in details
-- **Edit**: Click the edit icon on any project card
-- **Delete**: Use the delete option (with confirmation)
-- **Status**: Track project progress with status updates
+#### 🔐 User Authentication
+- **Secure Registration**: Create account with email validation
+- **Login System**: JWT-based authentication with secure sessions
+- **Password Security**: bcrypt encryption for password protection
+- **Session Management**: Automatic token refresh and logout
 
-#### Task Management
-- **Kanban Board**: Drag and drop tasks between columns
-- **Create Tasks**: Use the "+" button in any column
-- **Edit Tasks**: Click on any task card to edit details
-- **Filtering**: Filter tasks by project or priority
+#### 📊 Dashboard Features
+- **Real-time Statistics**: Live updates of project and task metrics
+- **Visual Analytics**: Charts showing task distribution and completion rates
+- **Recent Activity**: Timeline of recent changes and updates
+- **Quick Actions**: Fast access to create projects and tasks
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
 
-#### Dashboard Analytics
-- **Overview**: See total projects, tasks, and completion rates
-- **Charts**: Visual representation of your progress
-- **Recent Activity**: Track recent changes and updates
+#### 🗂️ Project Management
+- **Create Projects**: Add new projects with custom names and descriptions
+- **Project Overview**: View project-specific statistics and progress
+- **Project Settings**: Edit project details and configurations
+- **Project Analytics**: Detailed insights into project performance
+- **Multi-project Support**: Manage multiple projects simultaneously
+
+#### ✅ Advanced Task Management
+- **Task Creation**: Rich task creation with multiple fields
+  - Title and detailed descriptions
+  - Priority levels (Low, Medium, High, Critical)
+  - Due dates and deadlines
+  - Custom tags and categories
+- **Kanban Board**: Interactive drag-and-drop interface
+  - Four status columns: To Do, In Progress, In Review, Completed
+  - Smooth animations and visual feedback
+  - Touch-friendly mobile interactions
+  - Real-time updates across sessions
+- **Task Operations**:
+  - Edit tasks inline or in modal dialogs
+  - Delete tasks with confirmation
+  - Bulk operations for multiple tasks
+  - Task filtering and search functionality
+
+#### 📱 Mobile Experience
+- **Responsive Design**: Fully optimized for mobile devices
+- **Touch Interactions**: Native-feeling touch gestures
+- **Mobile Navigation**: Simplified navigation for small screens
+- **Offline Support**: Basic offline functionality (future enhancement)
+
+#### 🎨 UI/UX Features
+- **Modern Design**: Clean, professional interface with dark theme
+- **Smooth Animations**: Micro-interactions and transitions
+- **Loading States**: Visual feedback during data operations
+- **Error Handling**: User-friendly error messages and recovery
+- **Accessibility**: Keyboard navigation and screen reader support
+
+### Workflow Examples
+
+#### Creating Your First Project
+1. Navigate to the Dashboard
+2. Click "Create New Project"
+3. Enter project name and description
+4. Click "Create Project"
+5. You'll be redirected to the project's Kanban board
+
+#### Managing Tasks on Kanban Board
+1. Click "Add Task" to create a new task
+2. Fill in task details (title, description, priority, due date)
+3. Task appears in "To Do" column
+4. Drag tasks between columns to update status
+5. Click on tasks to edit or view details
+
+#### Using the Dashboard Analytics
+1. View overview statistics on the main dashboard
+2. Check task completion rates and trends
+3. Monitor recent activity and changes
+4. Use filters to focus on specific projects or time periods
 
 ## 🔄 Development Workflow
 
