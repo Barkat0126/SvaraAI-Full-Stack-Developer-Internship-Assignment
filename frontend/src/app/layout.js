@@ -1,6 +1,5 @@
 'use client';
 
-import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import AppLayout from '@/components/Layout/AppLayout';

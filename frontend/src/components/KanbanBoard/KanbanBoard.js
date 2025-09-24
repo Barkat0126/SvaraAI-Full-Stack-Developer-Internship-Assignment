@@ -63,13 +63,13 @@ export default function KanbanBoard({ tasks = [], onTaskUpdate, projects = [] })
       count: filteredTasks.filter(task => task.status === 'in-progress').length
     },
     {
-      id: 'completed',
+      id: 'done',
       title: 'Done',
       icon: '✅',
       color: 'from-green-500 to-emerald-600',
       borderColor: 'border-green-500/50',
       bgColor: 'from-green-50/10 to-emerald-100/10',
-      count: filteredTasks.filter(task => task.status === 'completed').length
+      count: filteredTasks.filter(task => task.status === 'done').length
     }
   ], [filteredTasks]);
 
@@ -78,7 +78,7 @@ export default function KanbanBoard({ tasks = [], onTaskUpdate, projects = [] })
     return {
       pending: filteredTasks.filter(task => task.status === 'pending'),
       'in-progress': filteredTasks.filter(task => task.status === 'in-progress'),
-      completed: filteredTasks.filter(task => task.status === 'completed')
+      done: filteredTasks.filter(task => task.status === 'done')
     };
   }, [filteredTasks]);
 

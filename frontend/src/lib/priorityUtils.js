@@ -1,11 +1,18 @@
 // Priority utility functions for consistent color-coded priority system
 
 export const PRIORITY_LEVELS = {
-  LOW: 'low',
-  MEDIUM: 'medium',
-  HIGH: 'high',
-  URGENT: 'urgent'
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High'
 };
+
+export const PRIORITY_OPTIONS = [
+  PRIORITY_LEVELS.LOW,
+  PRIORITY_LEVELS.MEDIUM,
+  PRIORITY_LEVELS.HIGH
+];
+
+export const STATUS_OPTIONS = ['To Do', 'In Progress', 'Done'];
 
 export const getPriorityConfig = (priority) => {
   const configs = {
@@ -44,18 +51,6 @@ export const getPriorityConfig = (priority) => {
       badgeClass: 'bg-orange-100 text-orange-800 border-orange-200',
       dotClass: 'bg-orange-500',
       priority: 3
-    },
-    [PRIORITY_LEVELS.URGENT]: {
-      label: 'Urgent',
-      color: 'bg-gradient-to-r from-red-500 to-pink-500',
-      textColor: 'text-white',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
-      ringColor: 'ring-red-500/20',
-      icon: '🔴',
-      badgeClass: 'bg-red-100 text-red-800 border-red-200',
-      dotClass: 'bg-red-500',
-      priority: 4
     }
   };
   
@@ -64,7 +59,7 @@ export const getPriorityConfig = (priority) => {
 
 export const getStatusConfig = (status) => {
   const configs = {
-    todo: {
+    'To Do': {
       label: 'To Do',
       color: 'bg-gradient-to-r from-slate-500 to-gray-500',
       textColor: 'text-white',
@@ -74,7 +69,7 @@ export const getStatusConfig = (status) => {
       badgeClass: 'bg-slate-100 text-slate-800 border-slate-200',
       dotClass: 'bg-slate-500'
     },
-    inProgress: {
+    'In Progress': {
       label: 'In Progress',
       color: 'bg-gradient-to-r from-blue-500 to-indigo-500',
       textColor: 'text-white',
@@ -84,7 +79,7 @@ export const getStatusConfig = (status) => {
       badgeClass: 'bg-blue-100 text-blue-800 border-blue-200',
       dotClass: 'bg-blue-500'
     },
-    completed: {
+    'Done': {
       label: 'Completed',
       color: 'bg-gradient-to-r from-green-500 to-emerald-500',
       textColor: 'text-white',
@@ -96,7 +91,7 @@ export const getStatusConfig = (status) => {
     }
   };
   
-  return configs[status] || configs.todo;
+  return configs[status] || configs['To Do'];
 };
 
 export const sortByPriority = (tasks) => {

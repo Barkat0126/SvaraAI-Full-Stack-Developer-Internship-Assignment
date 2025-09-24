@@ -54,10 +54,8 @@ export const AuthProvider = ({ children }) => {
       
       toast.success('Login successful!');
       
-      // Use replace instead of push to prevent back button issues
-      setTimeout(() => {
-        router.replace('/dashboard');
-      }, 100);
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/dashboard');
       
       return { success: true };
     } catch (error) {
@@ -80,10 +78,8 @@ export const AuthProvider = ({ children }) => {
       
       toast.success('Registration successful!');
       
-      // Use replace instead of push to prevent back button issues
-      setTimeout(() => {
-        router.replace('/dashboard');
-      }, 100);
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/dashboard');
       
       return { success: true };
     } catch (error) {
@@ -105,10 +101,8 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       toast.success('Logged out successfully');
       
-      // Use replace instead of push to prevent back button issues
-      setTimeout(() => {
-        router.replace('/auth/login');
-      }, 100);
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/auth/login');
     }
   };
 

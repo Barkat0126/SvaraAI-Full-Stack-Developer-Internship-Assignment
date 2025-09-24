@@ -29,12 +29,12 @@ const getTasks = async (req, res, next) => {
 
     // Date range filter
     if (req.query.startDate || req.query.endDate) {
-      filter.deadline = {};
+      filter.dueDate = {};
       if (req.query.startDate) {
-        filter.deadline.$gte = new Date(req.query.startDate);
+        filter.dueDate.$gte = new Date(req.query.startDate);
       }
       if (req.query.endDate) {
-        filter.deadline.$lte = new Date(req.query.endDate);
+        filter.dueDate.$lte = new Date(req.query.endDate);
       }
     }
 
@@ -96,9 +96,9 @@ const getTasksByProject = async (req, res, next) => {
 
     // Group tasks by status for Kanban board
     const groupedTasks = {
-      todo: tasks.filter(task => task.status === 'todo'),
+      'todo': tasks.filter(task => task.status === 'todo'),
       'in-progress': tasks.filter(task => task.status === 'in-progress'),
-      done: tasks.filter(task => task.status === 'done')
+      'done': tasks.filter(task => task.status === 'done')
     };
 
     res.status(200).json({
@@ -339,8 +339,8 @@ const getDashboardStats = async (req, res, next) => {
     // Overdue tasks
     const overdueTasks = await Task.countDocuments({
       assignedTo: req.user.id,
-      deadline: { $lt: new Date() },
-      status: { $ne: 'done' }
+      dueDate: { $lt: new Date() },
+      status: { $ne: 'Done' }
     });
 
     // Recent tasks
@@ -357,8 +357,8 @@ const getDashboardStats = async (req, res, next) => {
 
     const tasksThisWeek = await Task.countDocuments({
       assignedTo: req.user.id,
-      deadline: { $gte: weekStart, $lte: weekEnd },
-      status: { $ne: 'done' }
+      dueDate: { $gte: weekStart, $lte: weekEnd },
+      status: { $ne: 'Done' }
     });
 
     res.status(200).json({
@@ -368,11 +368,11 @@ const getDashboardStats = async (req, res, next) => {
         tasksByStatus: tasksByStatus.reduce((acc, item) => {
           acc[item._id] = item.count;
           return acc;
-        }, { todo: 0, 'in-progress': 0, done: 0 }),
+        }, { 'To Do': 0, 'In Progress': 0, 'Done': 0 }),
         tasksByPriority: tasksByPriority.reduce((acc, item) => {
           acc[item._id] = item.count;
           return acc;
-        }, { low: 0, medium: 0, high: 0 }),
+        }, { 'Low': 0, 'Medium': 0, 'High': 0 }),
         overdueTasks,
         tasksThisWeek,
         recentTasks

@@ -21,7 +21,7 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
     formState: { errors }
   } = useForm({
     defaultValues: {
-      status: 'active'
+      status: 'Active'
     }
   });
 
@@ -35,7 +35,7 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
         deadline: data.deadline || undefined
       };
 
-      await projectsAPI.createProject(projectData);
+      await projectsAPI.create(projectData);
       toast.success('Project created successfully');
       onProjectCreated();
       handleClose();
@@ -94,10 +94,9 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
             <div>
               <label className="label">Status</label>
               <select className="input" {...register('status')}>
-                <option value="active">Active</option>
-                <option value="on-hold">On Hold</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="Active">Active</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Completed">Completed</option>
               </select>
             </div>
 

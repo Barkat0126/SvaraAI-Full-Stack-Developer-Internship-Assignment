@@ -37,7 +37,7 @@ export default function ProjectDetailPage() {
       setStats({
         totalTasks: tasks.length,
         todoTasks: tasks.filter(task => task.status === 'todo').length,
-        inProgressTasks: tasks.filter(task => task.status === 'in_progress').length,
+        inProgressTasks: tasks.filter(task => task.status === 'in-progress').length,
         doneTasks: tasks.filter(task => task.status === 'done').length
       });
     } catch (error) {

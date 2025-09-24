@@ -22,7 +22,7 @@ export default function TaskCard({ task, getPriorityColor, getPriorityLabel, isD
     opacity: isSortableDragging ? 0.5 : 1,
   };
 
-  const isOverdue = task.deadline && new Date(task.deadline) < new Date() && task.status !== 'completed';
+  const isOverdue = task.deadline && new Date(task.deadline) < new Date() && task.status !== 'done';
   
   const getPriorityIcon = (priority) => {
     switch (priority) {

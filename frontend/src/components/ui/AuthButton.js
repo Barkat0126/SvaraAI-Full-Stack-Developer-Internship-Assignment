@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui';
 
 export default function AuthButton({ 
@@ -8,41 +9,176 @@ export default function AuthButton({
   loadingText = "Loading...", 
   icon = "🚀", 
   variant = "primary",
+  style = {},
   ...props 
 }) {
-  const baseClasses = "group relative w-full h-16 font-semibold text-lg rounded-2xl shadow-2xl transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden";
-  
-  const variantClasses = {
-    primary: "bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 hover:from-indigo-700 hover:via-purple-700 hover:to-blue-700 text-white shadow-purple-500/30 hover:shadow-purple-500/50",
-    secondary: "border-2 border-gray-400/50 text-gray-700 hover:border-purple-500/70 hover:text-gray-800 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-blue-50/80 backdrop-blur-sm"
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Base button styles
+  const baseButtonStyles = {
+    position: 'relative',
+    width: '100%',
+    height: '3rem',
+    fontWeight: '600',
+    fontSize: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    transition: 'all 0.5s ease',
+    transform: isHovered && !loading ? 'scale(1.02) translateY(-0.125rem)' : 'scale(1)',
+    overflow: 'hidden',
+    cursor: loading ? 'not-allowed' : 'pointer',
+    border: 'none',
+    opacity: loading ? 0.5 : 1
+  };
+
+  // Variant-specific styles
+  const variantStyles = {
+    primary: {
+      background: isHovered 
+        ? 'linear-gradient(90deg, #7c3aed 0%, #1d4ed8 50%, #7c3aed 100%)'
+        : 'linear-gradient(90deg, #9333ea 0%, #2563eb 50%, #9333ea 100%)',
+      color: '#ffffff',
+      boxShadow: isHovered 
+        ? '0 25px 50px -12px rgba(168, 85, 247, 0.7)'
+        : '0 25px 50px -12px rgba(168, 85, 247, 0.5)',
+      border: '1px solid rgba(168, 85, 247, 0.3)'
+    },
+    secondary: {
+      border: isHovered 
+        ? '2px solid rgba(168, 85, 247, 0.7)'
+        : '2px solid rgba(255, 255, 255, 0.3)',
+      color: isHovered ? '#ffffff' : '#e5e7eb',
+      backdropFilter: 'blur(0.125rem)',
+      background: isHovered 
+        ? 'linear-gradient(90deg, rgba(168, 85, 247, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)'
+        : 'rgba(255, 255, 255, 0.1)'
+    }
+  };
+
+  // Background overlay styles
+  const backgroundOverlayStyles = {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: isHovered ? 1 : 0,
+    transition: 'opacity 0.5s ease',
+    background: variant === 'primary' 
+      ? 'linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%)'
+      : 'linear-gradient(90deg, rgba(168, 85, 247, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)'
+  };
+
+  // Content styles
+  const contentStyles = {
+    position: 'relative',
+    zIndex: 10
+  };
+
+  // Loading content styles
+  const loadingContentStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  // Spinner styles with animation
+  const spinnerStyles = {
+    width: '1rem',
+    height: '1rem',
+    border: '2px solid #ffffff',
+    borderTop: '2px solid transparent',
+    borderRadius: '50%',
+    marginRight: '0.5rem',
+    animation: 'spin 1s linear infinite'
+  };
+
+  // Loading text styles
+  const loadingTextStyles = {
+    letterSpacing: '0.05em',
+    fontSize: '0.875rem'
+  };
+
+  // Normal content styles
+  const normalContentStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  // Icon styles
+  const iconStyles = {
+    marginRight: '0.5rem',
+    fontSize: '1.125rem',
+    transition: 'transform 0.3s ease',
+    transform: isHovered ? 'scale(1.1)' : 'scale(1)'
+  };
+
+  // Text styles
+  const textStyles = {
+    letterSpacing: '0.05em',
+    fontSize: '0.875rem'
+  };
+
+  // Shine effect styles
+  const shineEffectStyles = {
+    position: 'absolute',
+    top: '-0.5rem',
+    right: 0,
+    bottom: '-0.5rem',
+    left: 0,
+    transform: isHovered ? 'skewX(12deg) translateX(100%)' : 'skewX(12deg) translateX(-100%)',
+    transition: 'transform 1s ease',
+    background: variant === 'primary'
+      ? 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%)'
+      : 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)'
+  };
+
+  // Combine all button styles
+  const finalButtonStyles = {
+    ...baseButtonStyles,
+    ...variantStyles[variant],
+    ...style
   };
 
   return (
-    <Button
-      className={`${baseClasses} ${variantClasses[variant]}`}
-      disabled={loading}
-      {...props}
-    >
-      {/* Button background overlay */}
-      <div className={`absolute inset-0 ${variant === 'primary' ? 'bg-gradient-to-r from-white/10 to-transparent' : 'bg-gradient-to-r from-purple-500/5 to-blue-500/5'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+    <>
+      {/* Add keyframes for spinner animation */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       
-      {/* Button content */}
-      <div className="relative z-10">
-        {loading ? (
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent mr-3"></div>
-            <span className="tracking-wide">{loadingText}</span>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center">
-            <span className="mr-3 text-xl group-hover:scale-110 transition-transform duration-300">{icon}</span>
-            <span className="tracking-wide">{children}</span>
-          </div>
-        )}
-      </div>
-      
-      {/* Shine effect */}
-      <div className={`absolute inset-0 -top-2 -bottom-2 bg-gradient-to-r from-transparent ${variant === 'primary' ? 'via-white/20' : 'via-white/10'} to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000`}></div>
-    </Button>
+      <Button
+        style={finalButtonStyles}
+        disabled={loading}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        {...props}
+      >
+        {/* Button background overlay */}
+        <div style={backgroundOverlayStyles}></div>
+        
+        {/* Button content */}
+        <div style={contentStyles}>
+          {loading ? (
+            <div style={loadingContentStyles}>
+              <div style={spinnerStyles}></div>
+              <span style={loadingTextStyles}>{loadingText}</span>
+            </div>
+          ) : (
+            <div style={normalContentStyles}>
+              <span style={iconStyles}>{icon}</span>
+              <span style={textStyles}>{children}</span>
+            </div>
+          )}
+        </div>
+        
+        {/* Shine effect */}
+        <div style={shineEffectStyles}></div>
+      </Button>
+    </>
   );
 }

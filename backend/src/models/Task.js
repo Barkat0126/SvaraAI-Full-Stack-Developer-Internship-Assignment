@@ -14,23 +14,23 @@ const taskSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['todo', 'in-progress', 'done'],
-    default: 'todo',
+    enum: ['To Do', 'In Progress', 'Done'],
+    default: 'To Do',
     required: true
   },
   priority: {
     type: String,
-    enum: ['low', 'medium', 'high'],
-    default: 'medium',
+    enum: ['Low', 'Medium', 'High'],
+    default: 'Medium',
     required: true
   },
-  deadline: {
+  dueDate: {
     type: Date,
     validate: {
       validator: function(value) {
         return !value || value > new Date();
       },
-      message: 'Deadline must be in the future'
+      message: 'Due date must be in the future'
     }
   },
   projectId: {
@@ -58,17 +58,17 @@ const taskSchema = new mongoose.Schema({
 
 // Virtual for checking if task is overdue
 taskSchema.virtual('isOverdue').get(function() {
-  return this.deadline && this.deadline < new Date() && this.status !== 'done';
+  return this.dueDate && this.dueDate < new Date() && this.status !== 'Done';
 });
 
 // Virtual for priority color
 taskSchema.virtual('priorityColor').get(function() {
   const colors = {
-    low: '#10B981',    // Green
-    medium: '#F59E0B', // Yellow
-    high: '#EF4444'    // Red
+    'Low': '#10B981',    // Green
+    'Medium': '#F59E0B', // Yellow
+    'High': '#EF4444'    // Red
   };
-  return colors[this.priority] || colors.medium;
+  return colors[this.priority] || colors['Medium'];
 });
 
 // Indexes for better query performance
@@ -85,6 +85,42 @@ taskSchema.pre('save', async function(next) {
     
     this.position = lastTask ? lastTask.position + 1 : 1;
   }
+  next();
+});
+
+// Pre-save middleware to update project's updatedAt when task is modified
+taskSchema.pre('save', async function(next) {
+  if (this.isModified() && this.projectId) {
+    try {
+      await mongoose.model('Project').findByIdAndUpdate(
+        this.projectId,
+        { updatedAt: new Date() }
+      );
+    } catch (error) {
+      console.error('Error updating project timestamp:', error);
+    }
+  }
+  
+  // Auto-complete project if all tasks are done
+  if (this.isModified('status') && this.status === 'Done') {
+    try {
+      const totalTasks = await this.constructor.countDocuments({ projectId: this.projectId });
+      const completedTasks = await this.constructor.countDocuments({ 
+        projectId: this.projectId, 
+        status: 'Done' 
+      });
+      
+      if (totalTasks === completedTasks) {
+        await mongoose.model('Project').findByIdAndUpdate(
+          this.projectId,
+          { status: 'Completed' }
+        );
+      }
+    } catch (error) {
+      console.error('Error auto-completing project:', error);
+    }
+  }
+  
   next();
 });
 

@@ -54,7 +54,7 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateForm() || loading) return;
     
     try {
       const result = await login(formData);
@@ -77,17 +77,30 @@ export default function LoginPage() {
       subtitle="🚀 Sign in to continue to your dashboard"
       icon="🔐"
     >
-      {/* General Error */}
+      {/* Error Message */}
       {errors.general && (
-        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl backdrop-blur-sm">
-          <div className="flex items-center">
-            <span className="text-red-400 mr-2">⚠️</span>
-            <span className="text-red-300 text-sm">{errors.general}</span>
-          </div>
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(248, 113, 113, 0.3)',
+          borderRadius: '0.5rem',
+          padding: '0.75rem 1rem',
+          marginBottom: '1.5rem',
+          color: '#f87171',
+          fontSize: '0.875rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <span style={{ fontSize: '1rem' }}>⚠️</span>
+          {errors.general}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
         {/* Email Field */}
         <AuthFormField
           label="Email Address"
@@ -115,44 +128,96 @@ export default function LoginPage() {
         />
 
         {/* Submit Button */}
-        <AuthButton
-          type="submit"
-          loading={loading}
-          loadingText="Signing In..."
-          icon="🚀"
-          variant="primary"
-        >
-          Sign In
-        </AuthButton>
+        <div style={{ paddingTop: '0.5rem' }}>
+          <AuthButton
+            type="submit"
+            loading={loading}
+            loadingText="Signing in..."
+            icon="🚀"
+          >
+            Sign In
+          </AuthButton>
+        </div>
       </form>
 
-      {/* Footer Links */}
-      <div className="mt-8 text-center space-y-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/20"></div>
+      {/* Footer */}
+      <div style={{
+        marginTop: '1.5rem',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            position: 'absolute',
+            inset: '0',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <div style={{
+              width: '100%',
+              borderTop: '1px solid rgba(255, 255, 255, 0.3)'
+            }}></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white/10 backdrop-blur-sm text-gray-300 rounded-full">New to our platform?</span>
+          <div style={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            fontSize: '0.75rem',
+            fontWeight: '500',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}>
+            <span style={{
+              background: 'linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%)',
+              padding: '0 1rem',
+              color: '#9ca3af'
+            }}>or</span>
           </div>
         </div>
         
-        <Link href="/auth/register">
-          <AuthButton
-            variant="secondary"
-            icon="✨"
-            type="button"
+        <p style={{
+          color: '#d1d5db',
+          fontSize: '0.875rem'
+        }}>
+          <span style={{
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.25rem'
+          }}>New to our platform?</span>{' '}
+          <Link 
+            href="/auth/register" 
+            style={{
+              color: '#a855f7',
+              fontWeight: '600',
+              transition: 'color 0.3s ease',
+              textDecoration: 'none'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#d8b4fe'}
+            onMouseLeave={(e) => e.target.style.color = '#a855f7'}
           >
-            Create New Account
-          </AuthButton>
-        </Link>
+            Create an account
+          </Link>
+        </p>
         
-        <Link
-          href="/"
-          className="inline-block text-sm text-gray-400 hover:text-purple-300 transition-colors duration-300 hover:underline"
-        >
-          ← Back to Home
-        </Link>
+        <p style={{
+          color: '#9ca3af',
+          fontSize: '0.75rem'
+        }}>
+          <Link 
+            href="/" 
+            style={{
+              transition: 'color 0.3s ease',
+              textDecoration: 'none',
+              color: 'inherit'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#ffffff'}
+            onMouseLeave={(e) => e.target.style.color = '#9ca3af'}
+          >
+            ← Back to Home
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   );

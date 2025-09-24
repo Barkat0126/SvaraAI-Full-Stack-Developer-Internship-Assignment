@@ -38,13 +38,24 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('API Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      response: error.response?.data,
-      status: error.response?.status,
-      url: error.config?.url
-    });
+    
+    // Handle case where error might be null/undefined
+    if (!error) {
+      console.error('Error details: Error object is null or undefined');
+      return Promise.reject(new Error('Unknown API error'));
+    }
+    
+    // More robust error details logging
+    const errorDetails = {
+      message: error?.message || 'Unknown error',
+      code: error?.code || 'No code',
+      status: error?.response?.status || 'No status',
+      url: error?.config?.url || 'No URL',
+      responseData: error?.response?.data || 'No response data',
+      stack: error?.stack || 'No stack trace'
+    };
+    
+    console.error('Error details:', errorDetails);
     
     const message = error.response?.data?.message || 'An error occurred';
     

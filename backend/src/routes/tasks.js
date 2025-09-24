@@ -27,19 +27,19 @@ const taskValidation = [
     .withMessage('Description cannot be more than 1000 characters'),
   body('status')
     .optional()
-    .isIn(['todo', 'in-progress', 'done'])
-    .withMessage('Status must be todo, in-progress, or done'),
+    .isIn(['To Do', 'In Progress', 'Done'])
+    .withMessage('Status must be To Do, In Progress, or Done'),
   body('priority')
     .optional()
-    .isIn(['low', 'medium', 'high'])
-    .withMessage('Priority must be low, medium, or high'),
-  body('deadline')
+    .isIn(['Low', 'Medium', 'High'])
+    .withMessage('Priority must be Low, Medium, or High'),
+  body('dueDate')
     .optional()
     .isISO8601()
-    .withMessage('Deadline must be a valid date')
+    .withMessage('Due date must be a valid date')
     .custom((value) => {
       if (value && new Date(value) <= new Date()) {
-        throw new Error('Deadline must be in the future');
+        throw new Error('Due date must be in the future');
       }
       return true;
     }),
@@ -70,16 +70,16 @@ const updateTaskValidation = [
     .withMessage('Description cannot be more than 1000 characters'),
   body('status')
     .optional()
-    .isIn(['todo', 'in-progress', 'done'])
-    .withMessage('Status must be todo, in-progress, or done'),
+    .isIn(['To Do', 'In Progress', 'Done'])
+    .withMessage('Status must be To Do, In Progress, or Done'),
   body('priority')
     .optional()
-    .isIn(['low', 'medium', 'high'])
-    .withMessage('Priority must be low, medium, or high'),
-  body('deadline')
+    .isIn(['Low', 'Medium', 'High'])
+    .withMessage('Priority must be Low, Medium, or High'),
+  body('dueDate')
     .optional()
     .isISO8601()
-    .withMessage('Deadline must be a valid date'),
+    .withMessage('Due date must be a valid date'),
   body('tags')
     .optional()
     .isArray()

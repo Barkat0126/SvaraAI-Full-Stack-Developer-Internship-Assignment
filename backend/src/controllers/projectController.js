@@ -211,8 +211,8 @@ const getProjectStats = async (req, res, next) => {
 
     const overdueTasks = await Task.countDocuments({
       projectId: project._id,
-      deadline: { $lt: new Date() },
-      status: { $ne: 'done' }
+      dueDate: { $lt: new Date() },
+      status: { $ne: 'Done' }
     });
 
     res.status(200).json({
@@ -225,11 +225,11 @@ const getProjectStats = async (req, res, next) => {
         tasksByStatus: stats.reduce((acc, item) => {
           acc[item._id] = item.count;
           return acc;
-        }, { todo: 0, 'in-progress': 0, done: 0 }),
+        }, { 'To Do': 0, 'In Progress': 0, 'Done': 0 }),
         tasksByPriority: priorityStats.reduce((acc, item) => {
           acc[item._id] = item.count;
           return acc;
-        }, { low: 0, medium: 0, high: 0 }),
+        }, { 'Low': 0, 'Medium': 0, 'High': 0 }),
         overdueTasks
       }
     });
