@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import KanbanBoard from '@/components/Kanban/KanbanBoard';
-import CreateTaskModal from '@/components/CreateTaskModal';
+import CreateTaskModal from '@/components/Kanban/CreateTaskModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { tasksAPI, projectsAPI } from '@/lib/api';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
@@ -156,11 +156,7 @@ export default function Dashboard() {
                 onClick={() => setIsCreateModalOpen(true)}
                 className="group relative px-6 @md:px-8 py-3 @md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl shadow-glow-md hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 @container"
               >
-                <span className="relative z-10 flex items-center gap-2 text-sm @md:text-base">
-                  <Plus className="w-4 h-4 @md:w-5 @md:h-5 transition-transform group-hover:rotate-90" />
-                  <span className="hidden @sm:inline">Create Task</span>
-                  <span className="@sm:hidden">Create</span>
-                </span>
+                
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
               </button>
             </div>
