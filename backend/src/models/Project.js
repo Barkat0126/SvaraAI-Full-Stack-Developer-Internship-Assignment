@@ -9,7 +9,6 @@ const projectSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Project description is required'],
     trim: true,
     maxlength: [500, 'Description cannot be more than 500 characters']
   },
@@ -20,12 +19,15 @@ const projectSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'completed', 'archived'],
-    default: 'active'
+    enum: ['Active', 'Completed', 'On Hold'],
+    default: 'Active'
   },
   color: {
     type: String,
     default: '#3B82F6' // Default blue color
+  },
+  deadline: {
+    type: Date
   }
 }, {
   timestamps: true,

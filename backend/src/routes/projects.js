@@ -19,17 +19,22 @@ const projectValidation = [
     .isLength({ min: 1, max: 100 })
     .withMessage('Project name must be between 1 and 100 characters'),
   body('description')
+    .optional()
     .trim()
-    .isLength({ min: 1, max: 500 })
-    .withMessage('Description must be between 1 and 500 characters'),
+    .isLength({ max: 500 })
+    .withMessage('Description cannot be more than 500 characters'),
   body('color')
     .optional()
     .matches(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
     .withMessage('Color must be a valid hex color'),
   body('status')
     .optional()
-    .isIn(['active', 'completed', 'archived'])
-    .withMessage('Status must be active, completed, or archived')
+    .isIn(['Active', 'Completed', 'On Hold'])
+    .withMessage('Status must be Active, Completed, or On Hold'),
+  body('deadline')
+    .optional()
+    .isISO8601()
+    .withMessage('Deadline must be a valid date')
 ];
 
 // Apply authentication middleware to all routes

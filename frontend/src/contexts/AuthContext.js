@@ -53,7 +53,9 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       
       toast.success('Login successful!');
-      router.push('/dashboard');
+      
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/dashboard');
       
       return { success: true };
     } catch (error) {
@@ -75,7 +77,9 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       
       toast.success('Registration successful!');
-      router.push('/dashboard');
+      
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/dashboard');
       
       return { success: true };
     } catch (error) {
@@ -95,8 +99,10 @@ export const AuthProvider = ({ children }) => {
     } finally {
       Cookies.remove('token');
       setUser(null);
-      router.push('/auth/login');
       toast.success('Logged out successfully');
+      
+      // Immediate redirect without timeout to prevent multiple calls
+      router.replace('/auth/login');
     }
   };
 

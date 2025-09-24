@@ -1,29 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Plus } from 'lucide-react';
+import KanbanBoard from '@/components/Kanban/KanbanBoard';
+import CreateTaskModal from '@/components/CreateTaskModal';
+import { useAuth } from '@/contexts/AuthContext';
 import { tasksAPI, projectsAPI } from '@/lib/api';
-import { Button } from '@/components/ui';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchData();
+    fetchDashboardData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const [tasksResponse, projectsResponse] = await Promise.all([
         tasksAPI.getAll(),
         projectsAPI.getAll()
       ]);
-      
-      setTasks(tasksResponse.data || []);
-      setProjects(projectsResponse.data || []);
+
+      setTasks(tasksResponse.data.tasks || []);
+      setProjects(projectsResponse.data.projects || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -31,385 +35,198 @@ export default function Dashboard() {
     }
   };
 
-  // Calculate statistics with proper guards
-  const tasksArray = Array.isArray(tasks) ? tasks : [];
-  const projectsArray = Array.isArray(projects) ? projects : [];
-  
-  const totalTasks = tasksArray.length;
-  const completedTasks = tasksArray.filter(task => task.status === 'completed').length;
-  const inProgressTasks = tasksArray.filter(task => task.status === 'inProgress').length;
-  const todoTasks = tasksArray.filter(task => task.status === 'todo').length;
-  const overdueTasks = tasksArray.filter(task => {
-    if (!task.deadline) return false;
-    return new Date(task.deadline) < new Date() && task.status !== 'completed';
-  }).length;
+  const handleTaskUpdate = async (taskId, updates) => {
+    try {
+      const response = await tasksAPI.update(taskId, updates);
+      const updatedTask = response.data.task;
+      
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task._id === taskId ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
 
-  const highPriorityTasks = tasksArray.filter(task => task.priority === 'high').length;
-  const mediumPriorityTasks = tasksArray.filter(task => task.priority === 'medium').length;
-  const lowPriorityTasks = tasksArray.filter(task => task.priority === 'low').length;
-
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  const activeProjects = projectsArray.filter(project => project.status === 'active').length;
-
-  // Chart data
-  const taskStatusData = [
-    { name: 'To Do', value: todoTasks, color: '#f59e0b' },
-    { name: 'In Progress', value: inProgressTasks, color: '#3b82f6' },
-    { name: 'Completed', value: completedTasks, color: '#10b981' }
-  ];
-
-  const priorityData = [
-    { name: 'High Priority', value: highPriorityTasks, color: '#ef4444' },
-    { name: 'Medium Priority', value: mediumPriorityTasks, color: '#f59e0b' },
-    { name: 'Low Priority', value: lowPriorityTasks, color: '#10b981' }
-  ];
-
-  const weeklyData = [
-    { name: 'Mon', completed: 12, created: 8 },
-    { name: 'Tue', completed: 19, created: 15 },
-    { name: 'Wed', completed: 8, created: 12 },
-    { name: 'Thu', completed: 15, created: 10 },
-    { name: 'Fri', completed: 22, created: 18 },
-    { name: 'Sat', completed: 5, created: 3 },
-    { name: 'Sun', completed: 8, created: 6 }
-  ];
+  const handleTaskCreated = (newTask) => {
+    setTasks(prevTasks => [...prevTasks, newTask]);
+    setIsCreateModalOpen(false);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-        {/* Background decorations */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-emerald-400/20 to-cyan-600/20 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded-lg w-64"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
-              ))}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 @container">
+        {/* Enhanced loading with Tailwind v4 features */}
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header skeleton with container queries */}
+          <div className="@lg:flex @lg:items-center @lg:justify-between space-y-4 @lg:space-y-0">
+            <div className="space-y-3">
+              <div className="h-8 @md:h-10 @lg:h-12 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl animate-shimmer @sm:w-80 @md:w-96 @lg:w-[28rem]"></div>
+              <div className="h-4 @md:h-5 bg-slate-200 rounded-lg animate-pulse w-64 @md:w-80"></div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="h-80 bg-gray-200 rounded-xl"></div>
-              <div className="h-80 bg-gray-200 rounded-xl"></div>
-            </div>
+            <div className="h-10 @md:h-11 bg-slate-200 rounded-xl animate-pulse w-32 @md:w-40"></div>
           </div>
+
+          {/* Stats skeleton with modern grid */}
+          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 @md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="glass rounded-2xl p-4 @md:p-6 animate-pulse">
+                <div className="h-4 bg-slate-200 rounded-lg w-20 mb-3"></div>
+                <div className="h-8 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl w-16 animate-shimmer"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Kanban skeleton with container-aware layout */}
+          <Card className="glass border-0 shadow-glow-sm backdrop-blur-xl">
+            <CardHeader className="@container">
+              <div className="@lg:flex @lg:items-center @lg:justify-between space-y-3 @lg:space-y-0">
+                <div className="space-y-2">
+                  <div className="h-6 @md:h-7 bg-slate-200 rounded-lg w-40 @md:w-48 animate-pulse"></div>
+                  <div className="h-4 bg-slate-200 rounded w-64 @md:w-80 animate-pulse"></div>
+                </div>
+                <div className="h-9 @md:h-10 bg-slate-200 rounded-xl w-28 @md:w-32 animate-pulse"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="@container">
+              <div className="grid grid-cols-1 @md:grid-cols-2 @xl:grid-cols-3 gap-4 @lg:gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-4">
+                    <div className="h-6 bg-slate-200 rounded-lg w-24 animate-pulse"></div>
+                    <div className="space-y-3">
+                      {[1, 2].map((j) => (
+                        <div key={j} className="glass-dark rounded-xl p-4 animate-pulse">
+                          <div className="h-4 bg-slate-300 rounded w-3/4 mb-2"></div>
+                          <div className="h-3 bg-slate-300 rounded w-1/2"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-      {/* Background decorations */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-emerald-400/20 to-cyan-600/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-pink-400/10 to-yellow-400/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-              Dashboard Overview
-            </h1>
-            <p className="text-gray-600 mt-2">Track your productivity and project progress</p>
-          </div>
-          <Button
-            onClick={fetchData}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
-          >
-            <span>🔄</span>
-            Refresh Data
-          </Button>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Tasks */}
-          <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                  <span className="text-2xl">📋</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-gray-900">{totalTasks}</p>
-                  <p className="text-sm text-gray-600">Total Tasks</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden @container">
+      {/* Enhanced background with modern CSS */}
+      <div className="absolute inset-0 bg-gradient-mesh from-blue-400/10 via-purple-400/5 to-pink-400/10"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-radial from-blue-400/20 to-transparent rounded-full blur-3xl animate-float"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-conic from-purple-400/20 to-transparent rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+      
+      <div className="relative z-10 p-4 @md:p-6 @lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6 @md:space-y-8">
+          {/* Enhanced header with container queries */}
+          <div className="@container">
+            <div className="@lg:flex @lg:items-center @lg:justify-between space-y-4 @lg:space-y-0">
+              <div className="space-y-2 @md:space-y-3">
+                <h1 className="text-3xl @md:text-4xl @lg:text-5xl @xl:text-6xl font-bold text-balance">
+                  <span className="bg-gradient-to-r from-slate-800 via-blue-800 to-indigo-800 bg-clip-text text-transparent drop-shadow-sm">
+                    ✨ Dashboard
+                  </span>
+                </h1>
+                <p className="text-slate-700 text-lg @md:text-xl @lg:text-2xl text-pretty max-w-2xl">
+                  Manage your projects and tasks efficiently with modern tools
+                </p>
+                
+                {/* Enhanced status indicators with container-aware layout */}
+                <div className="flex flex-wrap items-center gap-3 @md:gap-4 pt-2">
+                  <div className="flex items-center gap-2 px-3 @md:px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-full shadow-sm backdrop-blur-sm">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-green-700 text-sm @md:text-base font-medium">Live updates</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 px-3 @md:px-4 py-2 glass rounded-full shadow-sm">
+                    <span className="text-slate-600 text-sm @md:text-base font-medium">{tasks.length} total tasks</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 px-3 @md:px-4 py-2 glass rounded-full shadow-sm">
+                    <span className="text-slate-600 text-sm @md:text-base font-medium">3 projects</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, (totalTasks / 50) * 100)}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs text-gray-500">of 50 goal</span>
-              </div>
+              
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="group relative px-6 @md:px-8 py-3 @md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl shadow-glow-md hover:shadow-glow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 @container"
+              >
+                <span className="relative z-10 flex items-center gap-2 text-sm @md:text-base">
+                  <Plus className="w-4 h-4 @md:w-5 @md:h-5 transition-transform group-hover:rotate-90" />
+                  <span className="hidden @sm:inline">Create Task</span>
+                  <span className="@sm:hidden">Create</span>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-2xl blur opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+              </button>
             </div>
           </div>
 
-          {/* Completed Tasks */}
-          <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-gray-900">{completedTasks}</p>
-                  <p className="text-sm text-gray-600">Completed</p>
+          {/* Enhanced stats grid with container queries */}
+          <div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-4 @md:gap-6 @container">
+            {[
+              { label: 'Total Tasks', value: tasks.length, color: 'blue', icon: '📋' },
+              { label: 'In Progress', value: tasks.filter(t => t.status === 'in-progress').length, color: 'yellow', icon: '⏳' },
+              { label: 'Completed', value: tasks.filter(t => t.status === 'completed').length, color: 'green', icon: '✅' }
+            ].map((stat, index) => (
+              <div key={stat.label} className="group @container">
+                <div className="glass rounded-2xl @md:rounded-3xl p-4 @md:p-6 @lg:p-8 hover:shadow-glow-md transition-all duration-300 transform hover:scale-105 border border-white/20">
+                  <div className="flex items-center justify-between mb-3 @md:mb-4">
+                    <span className="text-slate-600 text-sm @md:text-base font-medium text-pretty">{stat.label}</span>
+                    <span className="text-xl @md:text-2xl">{stat.icon}</span>
+                  </div>
+                  <div className={`text-2xl @md:text-3xl @lg:text-4xl font-bold bg-gradient-to-r from-${stat.color}-600 to-${stat.color}-700 bg-clip-text text-transparent`}>
+                    {stat.value}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-emerald-600">{completionRate}%</span>
-                <span className="text-xs text-gray-500">completion rate</span>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* In Progress Tasks */}
-          <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
-                  <span className="text-2xl">⚡</span>
+          {/* Enhanced Kanban Board with modern features */}
+          <Card className="glass border-0 shadow-glow-sm backdrop-blur-xl rounded-3xl overflow-hidden @container">
+            <CardHeader className="bg-gradient-to-r from-white/50 to-white/30 backdrop-blur-sm border-b border-white/20 @container">
+              <div className="@lg:flex @lg:items-center @lg:justify-between space-y-3 @lg:space-y-0">
+                <div className="space-y-1 @md:space-y-2">
+                  <CardTitle className="text-xl @md:text-2xl @lg:text-3xl font-bold text-slate-800 text-balance">
+                    Project Kanban Board
+                  </CardTitle>
+                  <CardDescription className="text-slate-600 text-sm @md:text-base @lg:text-lg text-pretty">
+                    Organize and track your tasks with drag-and-drop functionality
+                  </CardDescription>
                 </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-gray-900">{inProgressTasks}</p>
-                  <p className="text-sm text-gray-600">In Progress</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${totalTasks > 0 ? (inProgressTasks / totalTasks) * 100 : 0}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs text-gray-500">active work</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Overdue Tasks */}
-          <div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                  <span className="text-2xl">⏰</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-gray-900">{overdueTasks}</p>
-                  <p className="text-sm text-gray-600">Overdue</p>
+                <div className="flex items-center gap-2 px-3 @md:px-4 py-2 glass rounded-full">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-heartbeat"></div>
+                  <span className="text-slate-600 text-xs @md:text-sm font-medium">Real-time sync</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {overdueTasks > 0 ? (
-                  <span className="text-sm font-medium text-red-600">Needs attention</span>
-                ) : (
-                  <span className="text-sm font-medium text-green-600">All on track</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Task Status Distribution */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Task Status Distribution</h3>
-              <div className="p-2 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg">
-                <span className="text-lg">📊</span>
-              </div>
-            </div>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={taskStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={120}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {taskStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Priority Distribution */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Priority Distribution</h3>
-              <div className="p-2 bg-gradient-to-br from-red-100 to-orange-100 rounded-lg">
-                <span className="text-lg">🎯</span>
-              </div>
-            </div>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={priorityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={{ fontSize: 12 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      border: 'none',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    radius={[8, 8, 0, 0]}
-                    fill="url(#priorityGradient)"
-                  />
-                  <defs>
-                    <linearGradient id="priorityGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#1d4ed8" />
-                    </linearGradient>
-                  </defs>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Weekly Activity Chart */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900">Weekly Activity</h3>
-              <p className="text-gray-600 text-sm">Tasks completed vs created this week</p>
-            </div>
-            <div className="p-2 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg">
-              <span className="text-lg">📈</span>
-            </div>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weeklyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
+            </CardHeader>
+            <CardContent className="p-4 @md:p-6 @lg:p-8 @container">
+              <div className="w-full">
+                <KanbanBoard 
+                  tasks={tasks} 
+                  onTaskUpdate={handleTaskUpdate}
+                  className="@container"
                 />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="completed" 
-                  stroke="#10b981" 
-                  strokeWidth={3}
-                  dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
-                  name="Completed Tasks"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="created" 
-                  stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
-                  name="Created Tasks"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl">
-                <span className="text-2xl">📁</span>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{projects.length}</p>
-                <p className="text-gray-600">Total Projects</p>
-                <p className="text-sm text-purple-600">{activeProjects} active</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{highPriorityTasks}</p>
-                <p className="text-gray-600">High Priority</p>
-                <p className="text-sm text-indigo-600">Needs focus</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{completionRate}%</p>
-                <p className="text-gray-600">Completion Rate</p>
-                <p className="text-sm text-teal-600">This month</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
+
+      {/* Enhanced Create Task Modal */}
+      {isCreateModalOpen && (
+        <CreateTaskModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onTaskCreated={handleTaskCreated}
+          className="@container"
+        />
+      )}
     </div>
   );
 }

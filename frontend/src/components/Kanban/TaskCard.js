@@ -5,11 +5,14 @@ import { tasksAPI } from '@/lib/api';
 import EditTaskModal from './EditTaskModal';
 import { Card, CardContent } from '@/components/ui';
 import { formatDate } from '@/lib/utils';
+import { getPriorityConfig, getStatusConfig, getPriorityBadge, getStatusBadge } from '@/lib/priorityUtils';
 import toast from 'react-hot-toast';
 
 export default function TaskCard({ task, onUpdate, onDelete }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(null);
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this task?')) {
@@ -34,91 +37,326 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
     onUpdate();
   };
 
-  const getPriorityConfig = (priority) => {
-    const configs = {
-      high: {
-        color: 'bg-gradient-to-r from-red-500 to-pink-500',
-        textColor: 'text-white',
-        bgColor: 'bg-red-50',
-        borderColor: 'border-red-200',
-        icon: '🔴'
-      },
-      medium: {
-        color: 'bg-gradient-to-r from-yellow-500 to-orange-500',
-        textColor: 'text-white',
-        bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-200',
-        icon: '🟡'
-      },
-      low: {
-        color: 'bg-gradient-to-r from-green-500 to-emerald-500',
-        textColor: 'text-white',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
-        icon: '🟢'
-      }
-    };
-    return configs[priority] || configs.medium;
-  };
-
-  const getStatusConfig = (status) => {
-    const configs = {
-      todo: {
-        color: 'bg-gradient-to-r from-slate-500 to-gray-500',
-        textColor: 'text-white',
-        icon: '📋'
-      },
-      inProgress: {
-        color: 'bg-gradient-to-r from-blue-500 to-indigo-500',
-        textColor: 'text-white',
-        icon: '⚡'
-      },
-      completed: {
-        color: 'bg-gradient-to-r from-green-500 to-emerald-500',
-        textColor: 'text-white',
-        icon: '✅'
-      }
-    };
-    return configs[status] || configs.todo;
-  };
-
   const priorityConfig = getPriorityConfig(task.priority);
   const statusConfig = getStatusConfig(task.status);
+  const priorityBadge = getPriorityBadge(task.priority, 'sm');
+  const statusBadge = getStatusBadge(task.status, 'sm');
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // Priority bar styles
+  const getPriorityBarStyles = (priority) => {
+    const baseStyles = {
+      height: '0.25rem',
+      width: '100%'
+    };
+
+    switch (priority) {
+      case 'high':
+        return { ...baseStyles, background: 'linear-gradient(to right, rgb(239, 68, 68), rgb(236, 72, 153))' };
+      case 'medium':
+        return { ...baseStyles, background: 'linear-gradient(to right, rgb(245, 158, 11), rgb(249, 115, 22))' };
+      case 'low':
+        return { ...baseStyles, background: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129))' };
+      default:
+        return { ...baseStyles, background: 'linear-gradient(to right, rgb(100, 116, 139), rgb(107, 114, 128))' };
+    }
+  };
+
+  // Task card styles
+  const taskCardStyles = {
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(2px)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    boxShadow: isHovered 
+      ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' 
+      : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    borderRadius: '0.75rem',
+    cursor: 'pointer',
+    transition: 'all 300ms',
+    transform: isHovered ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)'
+  };
+
+  // Hover overlay styles
+  const hoverOverlayStyles = {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(to bottom right, rgba(99, 102, 241, 0.05), rgba(59, 130, 246, 0.05))',
+    opacity: isHovered ? 1 : 0,
+    transition: 'opacity 300ms',
+    pointerEvents: 'none'
+  };
+
+  // Content styles
+  const contentStyles = {
+    position: 'relative',
+    padding: isMobile ? '0.75rem' : '1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: isMobile ? '0.5rem' : '0.75rem'
+  };
+
+  // Header styles
+  const headerStyles = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between'
+  };
+
+  const headerContentStyles = {
+    flex: 1,
+    minWidth: 0
+  };
+
+  const titleStyles = {
+    fontSize: isMobile ? '1rem' : '1.125rem',
+    fontWeight: '700',
+    color: isHovered ? 'rgb(79, 70, 229)' : 'rgb(17, 24, 39)',
+    marginBottom: '0.25rem',
+    transition: 'color 200ms',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden'
+  };
+
+  const descriptionStyles = {
+    color: 'rgb(75, 85, 99)',
+    fontSize: isMobile ? '0.8rem' : '0.875rem',
+    lineHeight: isMobile ? '1.4' : '1.5',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden'
+  };
+
+  // Action buttons styles
+  const actionsStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    marginLeft: '0.5rem',
+    opacity: isHovered ? 1 : 0,
+    transition: 'opacity 200ms'
+  };
+
+  const getActionButtonStyles = (buttonType) => {
+    const baseStyles = {
+      height: isMobile ? '2rem' : '1.75rem',
+      width: isMobile ? '2rem' : '1.75rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '0.5rem',
+      transition: 'all 200ms',
+      border: 'none',
+      background: 'transparent',
+      cursor: 'pointer'
+    };
+
+    if (hoveredButton === buttonType) {
+      if (buttonType === 'edit') {
+        return { ...baseStyles, backgroundColor: 'rgb(238, 242, 255)', color: 'rgb(79, 70, 229)' };
+      } else if (buttonType === 'delete') {
+        return { ...baseStyles, backgroundColor: 'rgb(254, 242, 242)', color: 'rgb(220, 38, 38)' };
+      }
+    }
+
+    return baseStyles;
+  };
+
+  // Badge container styles
+  const badgeContainerStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    flexWrap: 'wrap'
+  };
+
+  const projectBadgeStyles = {
+    background: 'linear-gradient(to right, rgb(224, 231, 255), rgb(219, 234, 254))',
+    color: 'rgb(79, 70, 229)',
+    padding: '0.25rem 0.5rem',
+    borderRadius: '9999px',
+    fontSize: '0.75rem',
+    fontWeight: '500',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem'
+  };
+
+  // Deadline styles
+  const deadlineStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.5rem',
+    background: 'linear-gradient(to right, rgb(255, 247, 237), rgb(254, 242, 242))',
+    borderRadius: '0.5rem',
+    border: '1px solid rgb(254, 215, 170)'
+  };
+
+  const deadlineContentStyles = {
+    flex: 1
+  };
+
+  const deadlineLabelStyles = {
+    fontSize: '0.75rem',
+    color: 'rgb(75, 85, 99)',
+    fontWeight: '500'
+  };
+
+  const deadlineDateStyles = {
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: 'rgb(194, 65, 12)'
+  };
+
+  // Tags styles
+  const tagsStyles = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.25rem'
+  };
+
+  const tagStyles = {
+    background: 'linear-gradient(to right, rgb(243, 232, 255), rgb(252, 231, 243))',
+    color: 'rgb(126, 34, 206)',
+    padding: '0.25rem 0.5rem',
+    borderRadius: '9999px',
+    fontSize: '0.75rem',
+    fontWeight: '500'
+  };
+
+  const tagMoreStyles = {
+    backgroundColor: 'rgb(243, 244, 246)',
+    color: 'rgb(75, 85, 99)',
+    padding: '0.25rem 0.5rem',
+    borderRadius: '9999px',
+    fontSize: '0.75rem',
+    fontWeight: '500'
+  };
+
+  // Assignee styles
+  const assigneeStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.5rem',
+    background: 'linear-gradient(to right, rgb(239, 246, 255), rgb(224, 231, 255))',
+    borderRadius: '0.5rem',
+    border: '1px solid rgb(191, 219, 254)'
+  };
+
+  const assigneeAvatarStyles = {
+    width: '1.5rem',
+    height: '1.5rem',
+    background: 'linear-gradient(to bottom right, rgb(79, 70, 229), rgb(59, 130, 246))',
+    borderRadius: '9999px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: '0.75rem',
+    fontWeight: '700'
+  };
+
+  const assigneeContentStyles = {
+    flex: 1,
+    minWidth: 0
+  };
+
+  const assigneeLabelStyles = {
+    fontSize: '0.75rem',
+    color: 'rgb(75, 85, 99)',
+    fontWeight: '500'
+  };
+
+  const assigneeNameStyles = {
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    color: 'rgb(29, 78, 216)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  };
+
+  // Footer styles
+  const footerStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: '0.5rem',
+    borderTop: '1px solid rgb(243, 244, 246)'
+  };
+
+  const createdDateStyles = {
+    fontSize: '0.75rem',
+    color: 'rgb(107, 114, 128)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem'
+  };
+
+  // Spinner styles
+  const spinnerStyles = {
+    animation: 'spin 1s linear infinite',
+    borderRadius: '50%',
+    height: '0.75rem',
+    width: '0.75rem',
+    border: '1px solid rgb(239, 68, 68)',
+    borderTopColor: 'transparent'
+  };
 
   return (
     <>
-      <Card className="group relative overflow-hidden bg-white/90 backdrop-blur-sm border border-white/30 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102 rounded-xl cursor-pointer">
+      <style jsx>{`
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
+      <Card 
+        style={taskCardStyles}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {/* Priority accent bar */}
-        <div className={`h-1 w-full ${priorityConfig.color}`}></div>
+        <div style={getPriorityBarStyles(task.priority)}></div>
         
         {/* Hover overlay effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+        <div style={hoverOverlayStyles}></div>
         
-        <CardContent className="relative p-4 space-y-3">
+        <CardContent style={contentStyles}>
           {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <h4 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors duration-200 line-clamp-2">
+          <div style={headerStyles}>
+            <div style={headerContentStyles}>
+              <h4 style={titleStyles}>
                 {task.title}
               </h4>
               {task.description && (
-                <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                <p style={descriptionStyles}>
                   {task.description}
                 </p>
               )}
             </div>
             
             {/* Action buttons */}
-            <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div style={actionsStyles}>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditModalOpen(true);
                 }}
-                className="h-7 w-7 flex items-center justify-center hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all duration-200"
+                style={getActionButtonStyles('edit')}
+                onMouseEnter={() => setHoveredButton('edit')}
+                onMouseLeave={() => setHoveredButton(null)}
                 title="Edit task"
               >
-                <span className="text-xs">✏️</span>
+                <span style={{ fontSize: '0.75rem' }}>✏️</span>
               </button>
               <button
                 onClick={(e) => {
@@ -126,27 +364,40 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
                   handleDelete();
                 }}
                 disabled={isDeleting}
-                className="h-7 w-7 flex items-center justify-center hover:bg-red-100 hover:text-red-600 rounded-lg transition-all duration-200"
+                style={getActionButtonStyles('delete')}
+                onMouseEnter={() => setHoveredButton('delete')}
+                onMouseLeave={() => setHoveredButton(null)}
                 title="Delete task"
               >
                 {isDeleting ? (
-                  <div className="animate-spin rounded-full h-3 w-3 border border-red-500 border-t-transparent"></div>
+                  <div style={spinnerStyles}></div>
                 ) : (
-                  <span className="text-xs">🗑️</span>
+                  <span style={{ fontSize: '0.75rem' }}>🗑️</span>
                 )}
               </button>
             </div>
           </div>
 
           {/* Priority and Project */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className={`${priorityConfig.color} ${priorityConfig.textColor} px-2 py-1 rounded-full text-xs font-semibold shadow-sm flex items-center gap-1`}>
-              <span>{priorityConfig.icon}</span>
-              {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1)}
+          <div style={badgeContainerStyles}>
+            <div style={{
+              padding: '0.25rem 0.5rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              color: 'white',
+              background: priorityConfig.gradient
+            }}>
+              <span>{priorityBadge.icon}</span>
+              {priorityBadge.label}
             </div>
             
             {task.project && (
-              <div className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+              <div style={projectBadgeStyles}>
                 <span>📁</span>
                 {task.project.name}
               </div>
@@ -155,11 +406,11 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
 
           {/* Deadline */}
           {task.deadline && (
-            <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-100">
-              <span className="text-xs">⏰</span>
-              <div className="flex-1">
-                <div className="text-xs text-gray-600 font-medium">Due</div>
-                <div className="text-xs font-semibold text-orange-700">
+            <div style={deadlineStyles}>
+              <span style={{ fontSize: '0.75rem' }}>⏰</span>
+              <div style={deadlineContentStyles}>
+                <div style={deadlineLabelStyles}>Due</div>
+                <div style={deadlineDateStyles}>
                   {formatDate(task.deadline)}
                 </div>
               </div>
@@ -168,17 +419,17 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
 
           {/* Tags */}
           {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div style={tagsStyles}>
               {task.tags.slice(0, 3).map((tag, index) => (
                 <span
                   key={index}
-                  className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium"
+                  style={tagStyles}
                 >
                   #{tag}
                 </span>
               ))}
               {task.tags.length > 3 && (
-                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-medium">
+                <span style={tagMoreStyles}>
                   +{task.tags.length - 3}
                 </span>
               )}
@@ -187,13 +438,13 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
 
           {/* Assignee */}
           {task.assignee && (
-            <div className="flex items-center gap-2 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-              <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <div style={assigneeStyles}>
+              <div style={assigneeAvatarStyles}>
                 {task.assignee.name?.charAt(0).toUpperCase() || '👤'}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs text-gray-600 font-medium">Assigned to</div>
-                <div className="text-xs font-semibold text-blue-700 truncate">
+              <div style={assigneeContentStyles}>
+                <div style={assigneeLabelStyles}>Assigned to</div>
+                <div style={assigneeNameStyles}>
                   {task.assignee.name || task.assignee.email}
                 </div>
               </div>
@@ -201,13 +452,24 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
           )}
 
           {/* Status indicator */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className={`${statusConfig.color} ${statusConfig.textColor} px-2 py-1 rounded-full text-xs font-semibold shadow-sm flex items-center gap-1`}>
-              <span>{statusConfig.icon}</span>
-              {task.status?.charAt(0).toUpperCase() + task.status?.slice(1).replace('_', ' ')}
+          <div style={footerStyles}>
+            <div style={{
+              padding: '0.25rem 0.5rem',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              color: 'white',
+              background: statusConfig.gradient
+            }}>
+              <span>{statusBadge.icon}</span>
+              {statusBadge.label}
             </div>
             
-            <div className="text-xs text-gray-500 flex items-center gap-1">
+            <div style={createdDateStyles}>
               <span>📅</span>
               {formatDate(task.createdAt)}
             </div>

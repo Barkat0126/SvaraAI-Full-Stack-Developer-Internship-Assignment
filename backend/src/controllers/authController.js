@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
-const { sendTokenResponse } = require('../utils/jwt');
+const { sendTokenResponse } = require('../utils/helpers');
 
 // @desc    Register user
 // @route   POST /api/auth/register

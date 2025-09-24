@@ -3,7 +3,6 @@
 import { Fragment, forwardRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 // Heroicons removed - using emoji instead
-import { cn } from '@/lib/utils';
 import { Button } from './Button';
 
 const Modal = forwardRef(({ 
@@ -12,21 +11,111 @@ const Modal = forwardRef(({
   title,
   description,
   children,
-  className,
   size = "default",
+  style = {},
   ...props 
 }, ref) => {
-  const sizeClasses = {
-    sm: "max-w-md",
-    default: "max-w-lg",
-    lg: "max-w-2xl",
-    xl: "max-w-4xl",
-    full: "max-w-7xl",
+  const sizeStyles = {
+    sm: { maxWidth: '28rem' },
+    default: { maxWidth: '32rem' },
+    lg: { maxWidth: '42rem' },
+    xl: { maxWidth: '56rem' },
+    full: { maxWidth: '80rem' },
+  };
+
+  // Dialog container styles
+  const dialogStyles = {
+    position: 'relative',
+    zIndex: 50
+  };
+
+  // Backdrop styles
+  const backdropStyles = {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    backdropFilter: 'blur(4px)'
+  };
+
+  // Modal container styles
+  const modalContainerStyles = {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflowY: 'auto'
+  };
+
+  // Modal wrapper styles
+  const modalWrapperStyles = {
+    display: 'flex',
+    minHeight: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem',
+    textAlign: 'center'
+  };
+
+  // Modal panel styles
+  const modalPanelStyles = {
+    width: '100%',
+    transform: 'scale(1)',
+    overflow: 'hidden',
+    borderRadius: '1rem',
+    backgroundColor: 'white',
+    padding: '1.5rem',
+    textAlign: 'left',
+    verticalAlign: 'middle',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    transition: 'all 300ms',
+    ...sizeStyles[size],
+    ...style
+  };
+
+  // Header container styles
+  const headerContainerStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '1rem'
+  };
+
+  // Title styles
+  const titleStyles = {
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    lineHeight: '1.5',
+    color: 'rgb(17, 24, 39)',
+    margin: 0
+  };
+
+  // Description styles
+  const descriptionStyles = {
+    marginTop: '0.25rem',
+    fontSize: '0.875rem',
+    color: 'rgb(75, 85, 99)',
+    margin: 0
+  };
+
+  // Close button styles
+  const closeButtonStyles = {
+    height: '2rem',
+    width: '2rem',
+    borderRadius: '50%'
+  };
+
+  // Close button text styles
+  const closeButtonTextStyles = {
+    fontSize: '0.875rem'
   };
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose} ref={ref} {...props}>
+      <Dialog as="div" style={dialogStyles} onClose={onClose} ref={ref} {...props}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -36,11 +125,11 @@ const Modal = forwardRef(({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+          <div style={backdropStyles} />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+        <div style={modalContainerStyles}>
+          <div style={modalWrapperStyles}>
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -50,25 +139,16 @@ const Modal = forwardRef(({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel 
-                className={cn(
-                  "w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all",
-                  sizeClasses[size],
-                  className
-                )}
-              >
-                <div className="flex items-center justify-between mb-4">
+              <Dialog.Panel style={modalPanelStyles}>
+                <div style={headerContainerStyles}>
                   <div>
                     {title && (
-                      <Dialog.Title
-                        as="h3"
-                        className="text-lg font-semibold leading-6 text-gray-900"
-                      >
+                      <Dialog.Title as="h3" style={titleStyles}>
                         {title}
                       </Dialog.Title>
                     )}
                     {description && (
-                      <Dialog.Description className="mt-1 text-sm text-gray-600">
+                      <Dialog.Description style={descriptionStyles}>
                         {description}
                       </Dialog.Description>
                     )}
@@ -77,9 +157,9 @@ const Modal = forwardRef(({
                     variant="ghost"
                     size="icon"
                     onClick={onClose}
-                    className="h-8 w-8 rounded-full"
+                    style={closeButtonStyles}
                   >
-                    <span className="text-sm">✕</span>
+                    <span style={closeButtonTextStyles}>✕</span>
                   </Button>
                 </div>
                 {children}
@@ -94,37 +174,59 @@ const Modal = forwardRef(({
 
 Modal.displayName = "Modal";
 
-const ModalHeader = forwardRef(({ className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
-    {...props}
-  >
-    {children}
-  </div>
-));
+const ModalHeader = forwardRef(({ children, style = {}, ...props }, ref) => {
+  const headerStyles = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.375rem',
+    textAlign: 'center',
+    '@media (min-width: 640px)': {
+      textAlign: 'left'
+    },
+    ...style
+  };
+
+  return (
+    <div ref={ref} style={headerStyles} {...props}>
+      {children}
+    </div>
+  );
+});
 ModalHeader.displayName = "ModalHeader";
 
-const ModalFooter = forwardRef(({ className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6", className)}
-    {...props}
-  >
-    {children}
-  </div>
-));
+const ModalFooter = forwardRef(({ children, style = {}, ...props }, ref) => {
+  const footerStyles = {
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    marginTop: '1.5rem',
+    '@media (min-width: 640px)': {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: '0.5rem'
+    },
+    ...style
+  };
+
+  return (
+    <div ref={ref} style={footerStyles} {...props}>
+      {children}
+    </div>
+  );
+});
 ModalFooter.displayName = "ModalFooter";
 
-const ModalContent = forwardRef(({ className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("mt-4", className)}
-    {...props}
-  >
-    {children}
-  </div>
-));
+const ModalContent = forwardRef(({ children, style = {}, ...props }, ref) => {
+  const contentStyles = {
+    marginTop: '1rem',
+    ...style
+  };
+
+  return (
+    <div ref={ref} style={contentStyles} {...props}>
+      {children}
+    </div>
+  );
+});
 ModalContent.displayName = "ModalContent";
 
 export { Modal, ModalHeader, ModalFooter, ModalContent };

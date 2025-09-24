@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+console.log('API_URL:', API_URL);
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_URL,
@@ -15,6 +17,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    console.log('Making API request:', config.method?.toUpperCase(), config.url, config.baseURL);
     const token = Cookies.get('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -22,6 +25,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -29,9 +33,30 @@ api.interceptors.request.use(
 // Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => {
+    console.log('API response received:', response.status, response.config.url);
     return response;
   },
   (error) => {
+    console.error('API Error:', error);
+    
+    // Handle case where error might be null/undefined
+    if (!error) {
+      console.error('Error details: Error object is null or undefined');
+      return Promise.reject(new Error('Unknown API error'));
+    }
+    
+    // More robust error details logging
+    const errorDetails = {
+      message: error?.message || 'Unknown error',
+      code: error?.code || 'No code',
+      status: error?.response?.status || 'No status',
+      url: error?.config?.url || 'No URL',
+      responseData: error?.response?.data || 'No response data',
+      stack: error?.stack || 'No stack trace'
+    };
+    
+    console.error('Error details:', errorDetails);
+    
     const message = error.response?.data?.message || 'An error occurred';
     
     if (error.response?.status === 401) {

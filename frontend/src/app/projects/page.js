@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { projectsAPI } from '@/lib/api';
 import ProjectCard from '@/components/Projects/ProjectCard';
 import CreateProjectModal from '@/components/Projects/CreateProjectModal';
@@ -10,6 +11,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -28,70 +30,158 @@ export default function ProjectsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading your projects...</p>
-        </div>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #475569 100%)'
+      }}>
+        <div style={{
+          animation: 'spin 1s linear infinite',
+          borderRadius: '50%',
+          height: '8rem',
+          width: '8rem',
+          borderBottom: '2px solid #7c3aed'
+        }}></div>
+        <style jsx>{`
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/10 to-indigo-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-300/5 to-indigo-400/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                My Projects
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Manage and organize your projects efficiently
-              </p>
-            </div>
-            
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2"
-            >
-              <span className="text-lg">✨</span>
-              New Project
-            </Button>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #475569 100%)',
+      padding: '1.5rem'
+    }}>
+      <div style={{
+        maxWidth: '80rem',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          flexDirection: typeof window !== 'undefined' && window.innerWidth >= 640 ? 'row' : 'column',
+          alignItems: typeof window !== 'undefined' && window.innerWidth >= 640 ? 'center' : 'stretch',
+          justifyContent: typeof window !== 'undefined' && window.innerWidth >= 640 ? 'space-between' : 'flex-start',
+          gap: '1rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <h1 style={{
+              fontSize: '2.25rem',
+              fontWeight: '700',
+              background: 'linear-gradient(to right, #ffffff, #cbd5e1, #a855f7)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              lineHeight: '1.2'
+            }}>
+              Projects
+            </h1>
+            <p style={{
+              color: '#94a3b8',
+              marginTop: '0.5rem',
+              fontSize: '1rem'
+            }}>
+              Create and manage your projects
+            </p>
           </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            onMouseEnter={() => setHoveredButton('create')}
+            onMouseLeave={() => setHoveredButton(null)}
+            style={{
+              background: 'linear-gradient(to right, #7c3aed, #a855f7)',
+              color: 'white',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '0.75rem',
+              fontWeight: '600',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              boxShadow: hoveredButton === 'create' ? '0 8px 15px rgba(124, 58, 237, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+              transform: hoveredButton === 'create' ? 'translateY(-1px)' : 'translateY(0)'
+            }}
+          >
+            <span>➕</span>
+            Create Project
+          </button>
         </div>
 
-        {/* Projects Grid */}
-        {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-white/20 text-center max-w-md mx-auto">
-              <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-4xl">📋</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                No Projects Yet
-              </h3>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Start your journey by creating your first project. Organize your tasks and boost your productivity!
-              </p>
-              <Button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center gap-2 mx-auto"
-              >
-                <span className="text-lg">🚀</span>
-                Create Your First Project
-              </Button>
-            </div>
+        {/* Empty State */}
+        {projects.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '4rem 1rem',
+            background: 'rgba(30, 41, 59, 0.5)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '1rem',
+            border: '1px solid rgba(51, 65, 85, 0.5)'
+          }}>
+            <div style={{
+              fontSize: '4rem',
+              marginBottom: '1rem'
+            }}>📋</div>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: 'white',
+              marginBottom: '0.5rem'
+            }}>
+              No projects yet
+            </h3>
+            <p style={{
+              color: '#94a3b8',
+              marginBottom: '2rem',
+              fontSize: '1rem'
+            }}>
+              Create your first project to get started with organizing your tasks
+            </p>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              onMouseEnter={() => setHoveredButton('createFirst')}
+              onMouseLeave={() => setHoveredButton(null)}
+              style={{
+                background: 'linear-gradient(to right, #7c3aed, #a855f7)',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.75rem',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease-in-out',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                boxShadow: hoveredButton === 'createFirst' ? '0 8px 15px rgba(124, 58, 237, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+                transform: hoveredButton === 'createFirst' ? 'translateY(-1px)' : 'translateY(0)',
+                margin: '0 auto'
+              }}
+            >
+              <span>➕</span>
+              Create Your First Project
+            </button>
           </div>
-        ) : (
+        )}
+
+        {/* Projects Grid */}
+        {projects.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {projects.map((project) => (
               <div
@@ -110,44 +200,125 @@ export default function ProjectsPage() {
 
         {/* Stats Section */}
         {projects.length > 0 && (
-          <div className="mt-16 bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-lg">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <div style={{
+            marginTop: '4rem',
+            background: 'rgba(30, 41, 59, 0.5)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            border: '1px solid rgba(51, 65, 85, 0.5)',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: '700',
+              color: 'white',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
               <span>📊</span>
               Project Overview
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                <div className="text-3xl font-bold text-blue-600 mb-1">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'repeat(4, 1fr)' : 
+                                 typeof window !== 'undefined' && window.innerWidth >= 640 ? 'repeat(2, 1fr)' : '1fr',
+              gap: '1.5rem'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)'
+              }}>
+                <div style={{
+                  fontSize: '1.875rem',
+                  fontWeight: '700',
+                  marginBottom: '0.25rem',
+                  color: '#60a5fa'
+                }}>
                   {projects.length}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#94a3b8',
+                  fontWeight: '500'
+                }}>
                   Total Projects
                 </div>
               </div>
               
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                <div className="text-3xl font-bold text-green-600 mb-1">
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(34, 197, 94, 0.2)',
+                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)'
+              }}>
+                <div style={{
+                  fontSize: '1.875rem',
+                  fontWeight: '700',
+                  marginBottom: '0.25rem',
+                  color: '#4ade80'
+                }}>
                   {projects.filter(p => p.status === 'active').length}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#94a3b8',
+                  fontWeight: '500'
+                }}>
                   Active Projects
                 </div>
               </div>
               
-              <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border border-yellow-100">
-                <div className="text-3xl font-bold text-yellow-600 mb-1">
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(234, 179, 8, 0.2)',
+                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)'
+              }}>
+                <div style={{
+                  fontSize: '1.875rem',
+                  fontWeight: '700',
+                  marginBottom: '0.25rem',
+                  color: '#fbbf24'
+                }}>
                   {projects.filter(p => p.status === 'planning').length}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#94a3b8',
+                  fontWeight: '500'
+                }}>
                   In Planning
                 </div>
               </div>
               
-              <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100">
-                <div className="text-3xl font-bold text-purple-600 mb-1">
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(168, 85, 247, 0.2)',
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)'
+              }}>
+                <div style={{
+                  fontSize: '1.875rem',
+                  fontWeight: '700',
+                  marginBottom: '0.25rem',
+                  color: '#a78bfa'
+                }}>
                   {projects.filter(p => p.status === 'completed').length}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#94a3b8',
+                  fontWeight: '500'
+                }}>
                   Completed
                 </div>
               </div>
